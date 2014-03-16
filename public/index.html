@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>Jax Node Chat</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" />
+	<link rel="stylesheet" href="css/bootstrap-theme.min.css" />
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+        }
+		ul#discussion  {
+			list-style-type: none;
+		}
+		.fade {
+			opacity: 0;
+			-webkit-transition: opacity 0.15s linear;
+			-moz-transition: opacity 0.15s linear;
+			-o-transition: opacity 0.15s linear;
+			transition: opacity 0.15s linear;
+		}
+		.fade.in {
+			opacity: 1;
+		}
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">JaxNode Chat</a>
+        </div>
+        <div class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </div>
+
+	
+
+    <div class="container">
+		<h2>JaxNode Chat Socket.io Example</h2>
+		
+        <div class="alert alert-warning fade"></div>
+		<button id="btnConnect" class="btn btn-primary">Connect</button>
+
+	    <div id="currentUsers" class="inline">
+	        <p>You are not currently connected</p>
+	    </div>
+
+	    <span id="isConnected" class="label label-default">Disconnected</span>
+	    <input type="text" id="message" />
+	    <input type="button" id="sendmessage" value="Send" class="btn btn-default" /><br /><br />
+	    <input type="hidden" id="displayname" />
+	    <div class="panel panel-info">
+	        <div class="panel-heading">
+	          <h3 class="panel-title">Your Chat here</h3>
+	        </div>
+	        <div class="panel-body pre-scrollable" style="height: 200px">
+	            <ul id="discussion">
+	            </ul>
+	        </div>
+	    </div>
+    </div><!-- /.container -->
+
+    
+	<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+	<script>
+		var users = [];
+		$(document).ready(function() {
+			var socket = {};
+			
+			$('#message').focus();
+			
+			$("#btnConnect").on("click", function (event) {
+			    if ($("span#isConnected").text() === "Disconnected")
+                {
+                    $('#displayname').val(prompt('Enter your name:', ''));
+                    socket = io.connect();
+					socket.on('connect', function(){
+                        $("span#isConnected").removeClass("label-default").addClass("label-success").text("Connected");
+                        $("#btnConnect").removeClass("btn-primary").addClass("btn-danger").text("Disconnect");
+                        //chat.server.addChatUser($('#displayname').val()).done(function () {
+                        //    chat.server.getAllChatUsers();
+                        //});
+                        $('#sendmessage').on("click", function (event) {
+                            // Call the Send method on the hub. 
+                            //chat.server.send($('#displayname').val(), $('#message').val());
+                            // Clear text box and reset focus for next comment. 
+                            $('#message').val('').focus();
+                        });
+                    });
+                } else {
+                    chat.server.removeChatUser($('#displayname').val()).done(function () {
+                        $("#currentUsers").html('<p>You are not currently connected</p>');
+                        //$.connection.hub.stop();
+                        $("span#isConnected").removeClass("label-success").addClass("label-default").text("Disconnected");
+                        $("#btnConnect").removeClass("btn-danger").addClass("btn-primary").text("Connect");
+                        $('#sendmessage').off("click");
+                    });
+                }
+
+            });
+		});
+		
+	</script>
+</body>
+</html>
