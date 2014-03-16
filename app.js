@@ -9,7 +9,7 @@ var express = require('express')
 , server = http.createServer(app)
 , io = require('socket.io').listen(server);
 var path = require('path');
-
+var users = [];
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -30,9 +30,13 @@ app.get('/', function(req, res) {
 });
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
+  socket.on('addUser', function (data) {
     console.log(data);
+	users.push(data.user);
+	socket.emit('newUserAddedMessage', { users: users });
+  });
+  socket.on('sendMessage', function(data) {
+	socket.emit('chat', { user: data.user, message: data.message });
   });
 });
 

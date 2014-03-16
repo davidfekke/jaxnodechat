@@ -98,7 +98,8 @@
 					socket.on('connect', function(){
                         $("span#isConnected").removeClass("label-default").addClass("label-success").text("Connected");
                         $("#btnConnect").removeClass("btn-primary").addClass("btn-danger").text("Disconnect");
-                        //chat.server.addChatUser($('#displayname').val()).done(function () {
+                        socket.emit('addUser', { user: $('#displayname').val() });
+						//chat.server.addChatUser($('#displayname').val()).done(function () {
                         //    chat.server.getAllChatUsers();
                         //});
                         $('#sendmessage').on("click", function (event) {
@@ -107,6 +108,13 @@
                             // Clear text box and reset focus for next comment. 
                             $('#message').val('').focus();
                         });
+						socket.on('newUserAddedMessage', function(data) {
+							users = data.users;
+							$("#currentUsers").html('Current users logged in: ');
+							$.each(users, function (index, item) {
+			                    $("#currentUsers").append('<span class="label label-default inline">' + item + '</span>&nbsp;');
+			                });
+						});
                     });
                 } else {
                     chat.server.removeChatUser($('#displayname').val()).done(function () {
