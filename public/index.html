@@ -105,16 +105,33 @@
                         $('#sendmessage').on("click", function (event) {
                             // Call the Send method on the hub. 
                             //chat.server.send($('#displayname').val(), $('#message').val());
+                            socket.emit('sendMessage', { user: $('#displayname').val(), message: $('#message').val() });
                             // Clear text box and reset focus for next comment. 
                             $('#message').val('').focus();
                         });
-						socket.on('newUserAddedMessage', function(data) {
+                        // usersInChat newUserAddedMessage
+                        socket.on('newUserAddedMessage', function(data) {
+                            console.log(data);
+                            $('.alert').text(data.name + ' just signed on.').addClass('in');
+                            setTimeout(function () {
+                                $('.alert').removeClass('in');
+                            }, 3000);
+                        });
+						socket.on('usersInChat', function(data) {
 							users = data.users;
 							$("#currentUsers").html('Current users logged in: ');
 							$.each(users, function (index, item) {
 			                    $("#currentUsers").append('<span class="label label-default inline">' + item + '</span>&nbsp;');
 			                });
 						});
+                        socket.on('chat', function(data) {
+                            var encodedName = $('<div />').text(data.user).html();
+                            var encodedMsg = $('<div />').text(data.message).html();
+                            // Add the message to the page.
+                            $('#discussion').append('<li><strong>' + encodedName
+                                    + '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
+                            $(".panel-body").scrollTop($('.panel-body')[0].scrollHeight);
+                        });
                     });
                 } else {
                     chat.server.removeChatUser($('#displayname').val()).done(function () {

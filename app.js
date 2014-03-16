@@ -33,10 +33,12 @@ io.sockets.on('connection', function (socket) {
   socket.on('addUser', function (data) {
     console.log(data);
 	users.push(data.user);
-	socket.emit('newUserAddedMessage', { users: users });
+    console.log(socket.id);
+	io.sockets.emit('newUserAddedMessage', { name: data.user });
+    io.sockets.emit('usersInChat', { users: users });
   });
   socket.on('sendMessage', function(data) {
-	socket.emit('chat', { user: data.user, message: data.message });
+	io.sockets.emit('chat', { user: data.user, message: data.message });
   });
 });
 
