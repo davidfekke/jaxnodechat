@@ -85,60 +85,59 @@
 	<script type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script>
 		var users = [];
+		var socket;
 		$(document).ready(function() {
-			var socket = {};
-			
 			$('#message').focus();
 			
 			$("#btnConnect").on("click", function (event) {
 			    if ($("span#isConnected").text() === "Disconnected")
                 {
                     $('#displayname').val(prompt('Enter your name:', ''));
-                    socket = io.connect();
-					socket.on('connect', function(){
-                        $("span#isConnected").removeClass("label-default").addClass("label-success").text("Connected");
-                        $("#btnConnect").removeClass("btn-primary").addClass("btn-danger").text("Disconnect");
-                        socket.emit('addUser', { user: $('#displayname').val() });
-						//chat.server.addChatUser($('#displayname').val()).done(function () {
-                        //    chat.server.getAllChatUsers();
-                        //});
-                        $('#sendmessage').on("click", function (event) {
-                            // Call the Send method on the hub. 
-                            //chat.server.send($('#displayname').val(), $('#message').val());
-                            socket.emit('sendMessage', { user: $('#displayname').val(), message: $('#message').val() });
-                            // Clear text box and reset focus for next comment. 
-                            $('#message').val('').focus();
-                        });
-                        socket.on('newUserAddedMessage', function(data) {
-                            console.log(data);
-                            $('.alert').text(data.name + ' just signed on.').addClass('in');
-                            setTimeout(function () {
-                                $('.alert').removeClass('in');
-                            }, 3000);
-                        });
-						socket.on('userRemovedMessage', function(data) {
-							users.pop(name);
-							$('.alert').text(name + ' just signed out.').addClass('in');
-							setTimeout(function () {
-								$('.alert').removeClass('in');
-							}, 3000);
-						});
-						socket.on('usersInChat', function(data) {
-							users = data.users;
-							$("#currentUsers").html('Current users logged in: ');
-							$.each(users, function (index, item) {
-								$("#currentUsers").append('<span class="label label-default inline">' + item + '</span>&nbsp;');
+					if ( !socket ) {
+						socket = io.connect();
+						socket.on('connect', function(){
+							$("span#isConnected").removeClass("label-default").addClass("label-success").text("Connected");
+							$("#btnConnect").removeClass("btn-primary").addClass("btn-danger").text("Disconnect");
+							socket.emit('addUser', { user: $('#displayname').val() });
+							$('#sendmessage').on("click", function (event) {
+								socket.emit('sendMessage', { user: $('#displayname').val(), message: $('#message').val() });
+								// Clear text box and reset focus for next comment. 
+								$('#message').val('').focus();
+							});
+							socket.on('newUserAddedMessage', function(data) {
+								console.log(data);
+								$('.alert').text(data.name + ' just signed on.').addClass('in');
+								setTimeout(function () {
+									$('.alert').removeClass('in');
+								}, 3000);
+							});
+							socket.on('userRemovedMessage', function(data) {
+								users.pop(name);
+								$('.alert').text(name + ' just signed out.').addClass('in');
+								setTimeout(function () {
+									$('.alert').removeClass('in');
+								}, 3000);
+							});
+							socket.on('usersInChat', function(data) {
+								users = data.users;
+								$("#currentUsers").html('Current users logged in: ');
+								$.each(users, function (index, item) {
+									$("#currentUsers").append('<span class="label label-default inline">' + item + '</span>&nbsp;');
+								});
+							});
+							socket.on('chat', function(data) {
+								var encodedName = $('<div />').text(data.user).html();
+								var encodedMsg = $('<div />').text(data.message).html();
+								// Add the message to the page.
+								$('#discussion').append('<li><strong>' + encodedName
+										+ '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
+								$(".panel-body").scrollTop($('.panel-body')[0].scrollHeight);
 							});
 						});
-                        socket.on('chat', function(data) {
-                            var encodedName = $('<div />').text(data.user).html();
-                            var encodedMsg = $('<div />').text(data.message).html();
-                            // Add the message to the page.
-                            $('#discussion').append('<li><strong>' + encodedName
-                                    + '</strong>:&nbsp;&nbsp;' + encodedMsg + '</li>');
-                            $(".panel-body").scrollTop($('.panel-body')[0].scrollHeight);
-                        });
-                    });
+					} else {
+						socket.socket.connect(); 
+					}
+					
                 } else {
                     //chat.server.removeChatUser($('#displayname').val()).done(function () {
 					socket.emit('disconnectUser', { user: $('#displayname').val() });
