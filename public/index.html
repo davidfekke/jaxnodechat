@@ -137,18 +137,15 @@
 					} else {
 						socket.socket.connect(); 
 					}
-					
                 } else {
                     //chat.server.removeChatUser($('#displayname').val()).done(function () {
 					socket.emit('disconnectUser', { user: $('#displayname').val() });
+					socket.disconnect();
                     $("#currentUsers").html('<p>You are not currently connected</p>');
-                        //$.connection.hub.stop();
 					$("span#isConnected").removeClass("label-success").addClass("label-default").text("Disconnected");
 					$("#btnConnect").removeClass("btn-danger").addClass("btn-primary").text("Connect");
 					$('#sendmessage').off("click");
-                    //});
                 }
-
             });
 		});
 		
