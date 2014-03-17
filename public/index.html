@@ -109,7 +109,6 @@
                             // Clear text box and reset focus for next comment. 
                             $('#message').val('').focus();
                         });
-                        // usersInChat newUserAddedMessage
                         socket.on('newUserAddedMessage', function(data) {
                             console.log(data);
                             $('.alert').text(data.name + ' just signed on.').addClass('in');
@@ -117,12 +116,19 @@
                                 $('.alert').removeClass('in');
                             }, 3000);
                         });
+						socket.on('userRemovedMessage', function(data) {
+							users.pop(name);
+							$('.alert').text(name + ' just signed out.').addClass('in');
+							setTimeout(function () {
+								$('.alert').removeClass('in');
+							}, 3000);
+						});
 						socket.on('usersInChat', function(data) {
 							users = data.users;
 							$("#currentUsers").html('Current users logged in: ');
 							$.each(users, function (index, item) {
-			                    $("#currentUsers").append('<span class="label label-default inline">' + item + '</span>&nbsp;');
-			                });
+								$("#currentUsers").append('<span class="label label-default inline">' + item + '</span>&nbsp;');
+							});
 						});
                         socket.on('chat', function(data) {
                             var encodedName = $('<div />').text(data.user).html();
@@ -134,13 +140,14 @@
                         });
                     });
                 } else {
-                    chat.server.removeChatUser($('#displayname').val()).done(function () {
-                        $("#currentUsers").html('<p>You are not currently connected</p>');
+                    //chat.server.removeChatUser($('#displayname').val()).done(function () {
+					socket.emit('disconnectUser', { user: $('#displayname').val() });
+                    $("#currentUsers").html('<p>You are not currently connected</p>');
                         //$.connection.hub.stop();
-                        $("span#isConnected").removeClass("label-success").addClass("label-default").text("Disconnected");
-                        $("#btnConnect").removeClass("btn-danger").addClass("btn-primary").text("Connect");
-                        $('#sendmessage').off("click");
-                    });
+					$("span#isConnected").removeClass("label-success").addClass("label-default").text("Disconnected");
+					$("#btnConnect").removeClass("btn-danger").addClass("btn-primary").text("Connect");
+					$('#sendmessage').off("click");
+                    //});
                 }
 
             });
