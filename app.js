@@ -43,7 +43,6 @@ io.sockets.on('connection', function (socket) {
 	socket.on('disconnectUser', function (data) {
 		removeFromUsersArray(data.user);
 		io.sockets.emit('userRemovedMessage', { name: data.user});
-		//socket.disconnect(true);
 	});
 });
 

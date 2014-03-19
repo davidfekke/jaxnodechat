@@ -96,6 +96,7 @@
 					if ( !socket ) {
 						socket = io.connect();
 						socket.on('connect', function(){
+                            console.log('Just connected to Socket.IO');
 							$("span#isConnected").removeClass("label-default").addClass("label-success").text("Connected");
 							$("#btnConnect").removeClass("btn-primary").addClass("btn-danger").text("Disconnect");
 							socket.emit('addUser', { user: $('#displayname').val() });
@@ -139,8 +140,11 @@
 						socket.socket.connect(); 
 					}
                 } else {
-                    //chat.server.removeChatUser($('#displayname').val()).done(function () {
 					socket.emit('disconnectUser', { user: $('#displayname').val() });
+                    socket.removeAllListeners('newUserAddedMessage');
+                    socket.removeAllListeners('userRemovedMessage');
+                    socket.removeAllListeners('usersInChat');
+                    socket.removeAllListeners('chat');
 					socket.disconnect();
                     $("#currentUsers").html('<p>You are not currently connected</p>');
 					$("span#isConnected").removeClass("label-success").addClass("label-default").text("Disconnected");
