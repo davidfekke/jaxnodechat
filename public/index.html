@@ -114,7 +114,7 @@
 							});
 							socket.on('userRemovedMessage', function(data) {
 								users.pop(name);
-								$('.alert').text(name + ' just signed out.').addClass('in');
+								$('.alert').text(data.name + ' just signed out.').addClass('in');
 								setTimeout(function () {
 									$('.alert').removeClass('in');
 								}, 3000);
