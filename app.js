@@ -4,11 +4,11 @@
  */
 
 const express = require('express');
-var app = express();
+const app = express();
 const http = require('http');
 const server = http.createServer(app);
-var io = require('socket.io').listen(server);
-var path = require('path');
+const io = require('socket.io').listen(server);
+const path = require('path');
 
 // all environments
 app.set('port', process.env.PORT || 3000);
@@ -18,7 +18,7 @@ app.get('/', function(req, res) {
 	res.sendfile(__dirname + '/public/index.html');
 });
 
-var ioRoutes = require('./routes/ioroutes')(io);
+const ioRoutes = require('./routes/ioroutes')(io);
 app.use('/io', ioRoutes);
 
 server.listen(app.get('port'), function(){
